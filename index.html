@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TiffinMate – Provider Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-body: #0f172a;
+      --bg-card: #020617;
+      --bg-soft: #0b1220;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.1);
+      --accent-warn: #facc15;
+      --accent-danger: #ef4444;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-soft: #1f2937;
+      --chip-bg: #111827;
+      --tab-bg: #020617;
+      --tab-active-bg: #111827;
+      --tab-border: #1f2937;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-pill: 999px;
+      --gap: 1.25rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 55%, #020617 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1200px;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #020617 0%, #020617 45%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .app-main {
+      padding: 1.5rem 1.75rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+      overflow-y: auto;
+    }
+
+    /* Header */
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 20% 0, #22c55e 0, #16a34a 45%, #166534 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #ecfdf5;
+      box-shadow: 0 10px 25px rgba(22, 163, 74, 0.6);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .brand-title {
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      font-size: 1rem;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .chip-location {
+      padding: 0.1rem 0.6rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-pill);
+      background: var(--chip-bg);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .stat-pill strong {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .pill-highlight {
+      border-color: rgba(34, 197, 94, 0.7);
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.16), rgba(15, 23, 42, 0.9));
+      color: #bbf7d0;
+    }
+
+    .notif-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notif-dot {
+      position: absolute;
+      top: 6px;
+      right: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent-danger);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35);
+    }
+
+    /* Search */
+
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.35rem;
+    }
+
+    .search-box {
+      flex: 1;
+      background: var(--bg-soft);
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-soft);
+      padding: 0.45rem 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 0.85rem;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .filter-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-soft);
+      font-size: 0.8rem;
+      padding: 0.4rem 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    /* Layout: main grid */
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.35fr);
+      gap: var(--gap);
+    }
+
+    .col-left,
+    .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #020617 0, #020617 40%, #020617 100%);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 1rem 1.1rem;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      gap: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .badge-soft {
+      border-radius: var(--radius-pill);
+      padding: 0.2rem 0.6rem;
+      font-size: 0.7rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+    }
+
+    /* Banner */
+
+    .banner {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.12), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(34, 197, 94, 0.55);
+    }
+
+    .banner-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #bbf7d0;
+    }
+
+    .banner-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+
+    .banner-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .banner-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .banner-meta {
+      font-size: 0.78rem;
+      color: #a7f3d0;
+    }
+
+    .banner-chip-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.35rem;
+    }
+
+    .banner-chip {
+      padding: 0.2rem 0.6rem;
+      font-size: 0.72rem;
+      border-radius: var(--radius-pill);
+      border: 1px dashed rgba(187, 247, 208, 0.65);
+      color: #bbf7d0;
+    }
+
+    .banner-pill {
+      padding: 0.35rem 0.7rem;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      font-size: 0.75rem;
+      color: #bbf7d0;
+    }
+
+    /* Capacity panel */
+
+    .capacity-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .capacity-group {
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      padding: 0.7rem 0.75rem;
+    }
+
+    .capacity-group h4 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .capacity-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .capacity-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .capacity-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .capacity-dot.half {
+      background: #38bdf8;
+    }
+
+    .capacity-bar-outer {
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: #020617;
+      margin-top: 0.3rem;
+      overflow: hidden;
+    }
+
+    .capacity-bar-inner {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      width: 65%;
+    }
+
+    .capacity-bar-inner.warn {
+      background: linear-gradient(90deg, #facc15, #f97316);
+      width: 80%;
+    }
+
+    .capacity-bar-inner.danger {
+      background: linear-gradient(90deg, #ef4444, #b91c1c);
+      width: 100%;
+    }
+
+    .capacity-status {
+      margin-top: 0.6rem;
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .capacity-status-text {
+      color: #facc15;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .capacity-edit-btn {
+      font-size: 0.75rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 0.25rem 0.7rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    /* Quick actions */
+
+    .quick-actions {
+      display: flex;
+      gap: 0.55rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 0.1rem;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 transparent;
+    }
+
+    .quick-action-btn {
+      flex: 0 0 auto;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-soft);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .quick-action-btn.primary {
+      border-color: rgba(34, 197, 94, 0.75);
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.16), rgba(15, 23, 42, 0.95));
+      color: #bbf7d0;
+    }
+
+    /* Performance tiles */
+
+    .tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.25rem;
+    }
+
+    .tile {
+      background: var(--bg-soft);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      padding: 0.6rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .tile-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .tile-value {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .tile-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .pill-positive {
+      color: #22c55e;
+      font-size: 0.72rem;
+    }
+
+    .pill-negative {
+      color: #ef4444;
+      font-size: 0.72rem;
+    }
+
+    /* Tabs + list */
+
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--tab-bg);
+      padding: 0.25rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--tab-border);
+      margin-bottom: 0.75rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tab {
+      flex: 0 0 auto;
+      padding: 0.32rem 0.8rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab span.count {
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #020617;
+      border: 1px solid var(--border-soft);
+    }
+
+    .tab.active {
+      background: var(--tab-active-bg);
+      color: var(--text-main);
+      border: 1px solid rgba(148, 163, 184, 0.65);
+    }
+
+    .tab.active span.count {
+      background: rgba(34, 197, 94, 0.16);
+      border-color: rgba(34, 197, 94, 0.7);
+      color: #bbf7d0;
+    }
+
+    .order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .order-item {
+      padding: 0.55rem 0.65rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .order-main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 0.78rem;
+    }
+
+    .order-name {
+      font-weight: 500;
+    }
+
+    .order-meta {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      color: var(--text-muted);
+      font-size: 0.74rem;
+    }
+
+    .order-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .order-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      align-items: flex-end;
+      font-size: 0.72rem;
+    }
+
+    .status-pill {
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .status-pill.new {
+      border-color: rgba(34, 197, 94, 0.7);
+      color: #bbf7d0;
+    }
+
+    .order-btn-row {
+      display: flex;
+      gap: 0.3rem;
+    }
+
+    .btn-ghost {
+      padding: 0.18rem 0.55rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-soft);
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .btn-ghost.primary {
+      border-color: rgba(34, 197, 94, 0.7);
+      color: #bbf7d0;
+    }
+
+    /* Today snapshot */
+
+    .snapshot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+    }
+
+    .snapshot-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.5rem 0.55rem;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border-soft);
+      background: var(--bg-soft);
+    }
+
+    .snapshot-main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.18rem;
+    }
+
+    .snapshot-name {
+      font-weight: 500;
+    }
+
+    .snapshot-meta {
+      color: var(--text-muted);
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      font-size: 0.74rem;
+    }
+
+    .snapshot-status {
+      font-size: 0.72rem;
+      color: #22c55e;
+    }
+
+    /* Calendar */
+
+    .calendar-wrapper {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      padding: 0.6rem 0.65rem 0.7rem;
+      background: var(--bg-soft);
+      font-size: 0.76rem;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+    }
+
+    .cal-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: transparent;
+      font-size: 0.7rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 0.15rem;
+      margin-top: 0.35rem;
+    }
+
+    .cal-day-header {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      padding-bottom: 0.2rem;
+    }
+
+    .cal-cell {
+      min-height: 40px;
+      border-radius: 9px;
+      padding: 0.25rem;
+      background: #020617;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cal-date {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .cal-metrics {
+      margin-top: 0.1rem;
+      display: flex;
+      gap: 0.2rem;
+      flex-wrap: wrap;
+      font-size: 0.65rem;
+    }
+
+    .cal-tag {
+      padding: 0.05rem 0.28rem;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #1f2937;
+    }
+
+    .cal-tag.success {
+      border-color: rgba(34, 197, 94, 0.7);
+    }
+
+    .cal-tag.warn {
+      border-color: rgba(250, 204, 21, 0.8);
+    }
+
+    .cal-tag.danger {
+      border-color: rgba(239, 68, 68, 0.9);
+    }
+
+    /* Footer nav */
+
+    .footer-nav {
+      margin-top: auto;
+      border-top: 1px solid rgba(15, 23, 42, 0.95);
+      background: radial-gradient(circle at top, #020617 0, #020617 55%, #020617 100%);
+      padding: 0.5rem 1.5rem 0.65rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .footer-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .footer-tab {
+      flex: 1;
+      max-width: 140px;
+      text-align: center;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.2rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    .footer-tab.active {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(148, 163, 184, 0.55);
+      color: var(--text-main);
+    }
+
+    .footer-secondary {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: right;
+      min-width: 120px;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 960px) {
+      .grid-main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app-main {
+        padding: 1.1rem 1.1rem 1rem;
+      }
+
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-stats {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .tiles-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 540px) {
+      .tiles-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .footer-secondary {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <main class="app-main">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-top">
+          <div class="brand">
+            <div class="brand-logo">TM</div>
+            <div class="brand-text">
+              <div class="brand-title">Khot’s TiffinMate Kitchen</div>
+              <div class="brand-sub">
+                Provider Dashboard
+                <span class="chip-location">
+                  📍 Wakad · Pune
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="header-stats">
+            <div class="stat-pill pill-highlight">
+              💰 Today: <strong>₹2,450</strong>
+            </div>
+            <div class="stat-pill">
+              🍱 Orders: <strong>88</strong>
+            </div>
+            <div class="stat-pill">
+              📅 November 2025
+            </div>
+            <button class="notif-btn" type="button">
+              🔔
+              <span class="notif-dot"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="search-row">
+          <div class="search-box">
+            🔍
+            <input
+              type="text"
+              placeholder="Search customer, order ID, mobile or area..."
+            />
+          </div>
+          <button class="filter-btn" type="button">
+            ⚙ Filters
+          </button>
+        </div>
+      </header>
+
+      <!-- Banner -->
+      <section class="card">
+        <div class="banner">
+          <div class="banner-label">Today’s focus</div>
+          <div class="banner-main">
+            <div class="banner-text">
+              <div class="banner-title">You have 5 new subscription requests</div>
+              <div class="banner-meta">
+                3 for Single Time · 2 for Both Time · Review before lunch window
+              </div>
+              <div class="banner-chip-row">
+                <span class="banner-chip">⏰ Lunch cut-off: 11:00 AM</span>
+                <span class="banner-chip">🌙 Dinner cut-off: 7:00 PM</span>
+              </div>
+            </div>
+            <div class="banner-pill">
+              💡 Tip: Accept stable areas first (nearby societies)
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main grid -->
+      <section class="grid-main">
+        <!-- LEFT COLUMN -->
+        <div class="col-left">
+          <!-- Capacity Panel -->
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Monthly Capacity</div>
+                <div class="card-subtitle">
+                  Based on single-time & both-time, full/half tiffin plans
+                </div>
+              </div>
+              <span class="badge-soft">Auto blocks new subscriptions when full</span>
+            </div>
+
+            <div class="capacity-grid">
+              <div class="capacity-group">
+                <h4>Single Time (Lunch OR Dinner)</h4>
+                <div class="capacity-row">
+                  <div class="capacity-label">
+                    <span class="capacity-dot"></span> Full Tiffin
+                  </div>
+                  <div>950 / 1400</div>
+                </div>
+                <div class="capacity-bar-outer">
+                  <div class="capacity-bar-inner warn"></div>
+                </div>
+
+                <div class="capacity-row">
+                  <div class="capacity-label">
+                    <span class="capacity-dot half"></span> Half Tiffin
+                  </div>
+                  <div>620 / 1000</div>
+                </div>
+                <div class="capacity-bar-outer">
+                  <div class="capacity-bar-inner"></div>
+                </div>
+              </div>
+
+              <div class="capacity-group">
+                <h4>Both Time (Lunch + Dinner)</h4>
+                <div class="capacity-row">
+                  <div class="capacity-label">
+                    <span class="capacity-dot"></span> Full Tiffin
+                  </div>
+                  <div>2100 / 2800</div>
+                </div>
+                <div class="capacity-bar-outer">
+                  <div class="capacity-bar-inner warn"></div>
+                </div>
+
+                <div class="capacity-row">
+                  <div class="capacity-label">
+                    <span class="capacity-dot half"></span> Half Tiffin
+                  </div>
+                  <div>1700 / 1700</div>
+                </div>
+                <div class="capacity-bar-outer">
+                  <div class="capacity-bar-inner danger"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="capacity-status">
+              <div class="capacity-status-text">
+                ⚠ Some plans are almost full · Half (Both Time) is closed
+              </div>
+              <button class="capacity-edit-btn" type="button">
+                ✎ Edit capacity
+              </button>
+            </div>
+          </section>
+
+          <!-- Quick actions -->
+          <section class="card">
+            <div class="card-header">
+              <div class="card-title">Quick Actions</div>
+              <div class="card-subtitle">Manage daily operations faster</div>
+            </div>
+            <div class="quick-actions">
+              <button class="quick-action-btn primary" type="button">
+                ➕ Add / Edit Menu
+              </button>
+              <button class="quick-action-btn" type="button">
+                📋 Subscription Requests
+              </button>
+              <button class="quick-action-btn" type="button">
+                🚚 Delivery Manager
+              </button>
+              <button class="quick-action-btn" type="button">
+                🚫 Cancelled Orders
+              </button>
+              <button class="quick-action-btn" type="button">
+                ⭐ Reviews
+              </button>
+              <button class="quick-action-btn" type="button">
+                📊 Reports
+              </button>
+            </div>
+          </section>
+
+          <!-- Performance + Orders -->
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Performance & Orders</div>
+                <div class="card-subtitle">
+                  Today’s snapshot + New requests
+                </div>
+              </div>
+            </div>
+
+            <div class="tiles-grid">
+              <div class="tile">
+                <div class="tile-label">Active Subscriptions</div>
+                <div class="tile-value">85</div>
+                <div class="tile-meta">
+                  <span class="pill-positive">+6 new this week</span>
+                </div>
+              </div>
+              <div class="tile">
+                <div class="tile-label">Today Delivered</div>
+                <div class="tile-value">64</div>
+                <div class="tile-meta">Lunch: 38 · Dinner: 26</div>
+              </div>
+              <div class="tile">
+                <div class="tile-label">Expiring Soon</div>
+                <div class="tile-value">6</div>
+                <div class="tile-meta">Next 3 days</div>
+              </div>
+              <div class="tile">
+                <div class="tile-label">Cancelled (Month)</div>
+                <div class="tile-value">4</div>
+                <div class="tile-meta">
+                  <span class="pill-negative">-2 vs last month</span>
+                </div>
+              </div>
+              <div class="tile">
+                <div class="tile-label">Revenue (Month)</div>
+                <div class="tile-value">₹48,500</div>
+                <div class="tile-meta">Pending: ₹3,200</div>
+              </div>
+              <div class="tile">
+                <div class="tile-label">Rating</div>
+                <div class="tile-value">4.4 ⭐</div>
+                <div class="tile-meta">128 reviews</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 0.9rem;">
+              <div class="tabs">
+                <button class="tab active" type="button">
+                  🆕 New Requests
+                  <span class="count">5</span>
+                </button>
+                <button class="tab" type="button">
+                  ✅ Accepted
+                  <span class="count">18</span>
+                </button>
+                <button class="tab" type="button">
+                  🚚 Out for Delivery
+                  <span class="count">7</span>
+                </button>
+                <button class="tab" type="button">
+                  🍽 Delivered
+                  <span class="count">64</span>
+                </button>
+                <button class="tab" type="button">
+                  ⏸ Hold / Skipped
+                  <span class="count">3</span>
+                </button>
+                <button class="tab" type="button">
+                  ❌ Cancelled
+                  <span class="count">4</span>
+                </button>
+              </div>
+
+              <div class="order-list">
+                <div class="order-item">
+                  <div class="order-main">
+                    <div class="order-name">Rohit Sharma · Silver Orchid</div>
+                    <div class="order-meta">
+                      <span>📆 30 days</span>
+                      <span>🍽 Both Time · Full</span>
+                      <span>💳 Prepaid</span>
+                    </div>
+                  </div>
+                  <div class="order-actions">
+                    <div class="status-pill new">New Subscription</div>
+                    <div class="order-btn-row">
+                      <button class="btn-ghost" type="button">Reject</button>
+                      <button class="btn-ghost primary" type="button">Accept</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="order-item">
+                  <div class="order-main">
+                    <div class="order-name">Ankit Patil · Phoenix Towers</div>
+                    <div class="order-meta">
+                      <span>📆 20 days</span>
+                      <span>☀ Lunch · Half</span>
+                      <span>🕒 Starts: 25 Nov</span>
+                    </div>
+                  </div>
+                  <div class="order-actions">
+                    <div class="status-pill new">New Subscription</div>
+                    <div class="order-btn-row">
+                      <button class="btn-ghost" type="button">Reject</button>
+                      <button class="btn-ghost primary" type="button">Accept</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="order-item">
+                  <div class="order-main">
+                    <div class="order-name">Sneha Kulkarni · Green Valley</div>
+                    <div class="order-meta">
+                      <span>📆 10 days</span>
+                      <span>🌙 Dinner · Full</span>
+                      <span>Cash on delivery</span>
+                    </div>
+                  </div>
+                  <div class="order-actions">
+                    <div class="status-pill new">New Subscription</div>
+                    <div class="order-btn-row">
+                      <button class="btn-ghost" type="button">Reject</button>
+                      <button class="btn-ghost primary" type="button">Accept</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-right">
+          <!-- Today’s Delivery Snapshot -->
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Today’s Deliveries</div>
+                <div class="card-subtitle">
+                  Next few upcoming tiffins
+                </div>
+              </div>
+              <span class="badge-soft">Lunch: 38 · Dinner: 26</span>
+            </div>
+
+            <div class="snapshot-list">
+              <div class="snapshot-item">
+                <div class="snapshot-main">
+                  <div class="snapshot-name">Rohit Sharma · Silver Orchid</div>
+                  <div class="snapshot-meta">
+                    <span>☀ Lunch</span>
+                    <span>⏰ 12:15 PM</span>
+                    <span>🚚 Assigned: Mahesh</span>
+                  </div>
+                </div>
+                <div class="snapshot-status">Out for delivery</div>
+              </div>
+
+              <div class="snapshot-item">
+                <div class="snapshot-main">
+                  <div class="snapshot-name">Pooja Deshmukh · Green Park</div>
+                  <div class="snapshot-meta">
+                    <span>🌙 Dinner</span>
+                    <span>⏰ 7:30 PM</span>
+                    <span>🚚 Assigned: Ajay</span>
+                  </div>
+                </div>
+                <div class="snapshot-status">Scheduled</div>
+              </div>
+
+              <div class="snapshot-item">
+                <div class="snapshot-main">
+                  <div class="snapshot-name">Rahul Jain · Blue River</div>
+                  <div class="snapshot-meta">
+                    <span>☀ Lunch</span>
+                    <span>⏰ 1:00 PM</span>
+                    <span>🚚 Not assigned</span>
+                  </div>
+                </div>
+                <div class="snapshot-status" style="color: #facc15;">
+                  Assign delivery
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Calendar -->
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Monthly Calendar</div>
+                <div class="card-subtitle">
+                  Delivered · Skipped · Cancelled overview
+                </div>
+              </div>
+              <span class="badge-soft">Heatmap by performance</span>
+            </div>
+
+            <div class="calendar-wrapper">
+              <div class="calendar-header">
+                <div>November 2025</div>
+                <div class="calendar-nav">
+                  <button class="cal-btn" type="button">‹</button>
+                  <button class="cal-btn" type="button">›</button>
+                </div>
+              </div>
+
+              <div class="calendar-grid">
+                <!-- Day headers -->
+                <div class="cal-day-header">Mon</div>
+                <div class="cal-day-header">Tue</div>
+                <div class="cal-day-header">Wed</div>
+                <div class="cal-day-header">Thu</div>
+                <div class="cal-day-header">Fri</div>
+                <div class="cal-day-header">Sat</div>
+                <div class="cal-day-header">Sun</div>
+
+                <!-- Example cells (static demo) -->
+                <div class="cal-cell">
+                  <div class="cal-date">1</div>
+                  <div class="cal-metrics">
+                    <span class="cal-tag success">✅ 58</span>
+                    <span class="cal-tag warn">⏸ 2</span>
+                  </div>
+                </div>
+                <div class="cal-cell">
+                  <div class="cal-date">2</div>
+                  <div class="cal-metrics">
+                    <span class="cal-tag success">✅ 60</span>
+                    <span class="cal-tag danger">❌ 1</span>
+                  </div>
+                </div>
+                <div class="cal-cell">
+                  <div class="cal-date">3</div>
+                  <div class="cal-metrics">
+                    <span class="cal-tag success">✅ 54</span>
+                  </div>
+                </div>
+                <div class="cal-cell">
+                  <div class="cal-date">4</div>
+                  <div class="cal-metrics">
+                    <span class="cal-tag success">✅ 62</span>
+                    <span class="cal-tag warn">⏸ 1</span>
+                  </div>
+                </div>
+                <div class="cal-cell">
+                  <div class="cal-date">5</div>
+                  <div class="cal-metrics">
+                    <span class="cal-tag success">✅ 59</span>
+                    <span class="cal-tag danger">❌ 2</span>
+                  </div>
+                </div>
+                <div class="cal-cell">
+                  <div class="cal-date">6</div>
+                  <div class="cal-metrics">
+                    <span class="cal-tag success">✅ 61</span>
+                  </div>
+                </div>
+                <div class="cal-cell">
+                  <div class="cal-date">7</div>
+                  <div class="cal-metrics">
+                    <span class="cal-tag success">✅ 57</span>
+                    <span class="cal-tag warn">⏸ 3</span>
+                  </div>
+                </div>
+
+                <!-- Remaining cells as simple placeholders -->
+                <div class="cal-cell"><div class="cal-date">8</div></div>
+                <div class="cal-cell"><div class="cal-date">9</div></div>
+                <div class="cal-cell"><div class="cal-date">10</div></div>
+                <div class="cal-cell"><div class="cal-date">11</div></div>
+                <div class="cal-cell"><div class="cal-date">12</div></div>
+                <div class="cal-cell"><div class="cal-date">13</div></div>
+                <div class="cal-cell"><div class="cal-date">14</div></div>
+                <div class="cal-cell"><div class="cal-date">15</div></div>
+                <div class="cal-cell"><div class="cal-date">16</div></div>
+                <div class="cal-cell"><div class="cal-date">17</div></div>
+                <div class="cal-cell"><div class="cal-date">18</div></div>
+                <div class="cal-cell"><div class="cal-date">19</div></div>
+                <div class="cal-cell"><div class="cal-date">20</div></div>
+                <div class="cal-cell"><div class="cal-date">21</div></div>
+                <div class="cal-cell"><div class="cal-date">22</div></div>
+                <div class="cal-cell"><div class="cal-date">23</div></div>
+                <div class="cal-cell"><div class="cal-date">24</div></div>
+                <div class="cal-cell"><div class="cal-date">25</div></div>
+                <div class="cal-cell"><div class="cal-date">26</div></div>
+                <div class="cal-cell"><div class="cal-date">27</div></div>
+                <div class="cal-cell"><div class="cal-date">28</div></div>
+                <div class="cal-cell"><div class="cal-date">29</div></div>
+                <div class="cal-cell"><div class="cal-date">30</div></div>
+                <div class="cal-cell"><div class="cal-date">31</div></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Nav -->
+    <footer class="footer-nav">
+      <div class="footer-tabs">
+        <button class="footer-tab active" type="button">
+          🏠 Home
+        </button>
+        <button class="footer-tab" type="button">
+          📍 Live Tracking
+        </button>
+        <button class="footer-tab" type="button">
+          💰 Payments
+        </button>
+        <button class="footer-tab" type="button">
+          📊 Reports
+        </button>
+        <button class="footer-tab" type="button">
+          👤 Account
+        </button>
+      </div>
+      <div class="footer-secondary">
+        TiffinMate Provider · v1.0
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
